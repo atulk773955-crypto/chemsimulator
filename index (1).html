@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ChemSimulator — Chemical Process Analysis & Simulation Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1720;--panel:#112430;--line:#23414f;--tx:#e6eef2;--mut:#8fa7b3;--ac:#5cc8d7;--hot:#f2994a;--bad:#f06a6a;--ok:#6fcf97;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=light]{--bg:#f3f6f8;--panel:#fff;--line:#cfdbe2;--tx:#12242f;--mut:#526b78;--ac:#0a7f93;--hot:#c4631a;--bad:#c0392b;--ok:#1e8a4c}
+@media(prefers-color-scheme:light){:root:not([data-theme=dark]):not([data-theme=light]){--bg:#f3f6f8}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;}
+#bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse at 70% 100%,#9a5230 0,transparent 55%),linear-gradient(#08121b 0%,#14232f 50%,#2c2a2c 80%,#5a3626 100%)}#bg svg{position:absolute;bottom:0;width:100%;height:46%}body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(rgba(11,23,32,.78),rgba(11,23,32,.9))}[data-theme=light] #bg{filter:brightness(2.4) saturate(.4)}[data-theme=light] body::before{background:rgba(243,246,248,.86)}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 5vw;border-bottom:1px solid var(--line);background:var(--bg)}
+header b{font-weight:600;letter-spacing:.04em}header nav{display:flex;gap:18px;align-items:center}header a{color:var(--mut);text-decoration:none}header a:hover{color:var(--tx)}
+button{font:inherit;cursor:pointer}.tg{background:none;border:1px solid var(--line);color:var(--tx);border-radius:6px;padding:4px 10px}
+.hero{padding:7vh 5vw 3vh;max-width:1200px;margin:auto}
+h1{font-size:clamp(28px,7vw,76px);line-height:1;margin:0;font-weight:600;letter-spacing:.02em}
+.sub{font-size:clamp(17px,2.4vw,22px);color:var(--ac);margin:10px 0 8px}
+.lead{max-width:62ch;color:var(--mut)}
+.flowbox{overflow-x:auto;margin-top:26px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:10px}
+.flowbox svg{min-width:720px;width:100%;display:block}
+.node{cursor:pointer}.node rect{fill:var(--bg);stroke:var(--ac);stroke-width:1.5;transition:fill .2s}.node:hover rect,.node:focus rect{fill:var(--line)}.node text{fill:var(--tx);font-size:13px}
+.flow{stroke:var(--ac);stroke-width:2.5;fill:none;stroke-dasharray:8 10;animation:fl var(--d,2s) linear infinite}.flow.hot{stroke:var(--hot)}.flow.rev{animation-direction:reverse}
+@keyframes fl{to{stroke-dashoffset:-18}}
+@media(prefers-reduced-motion:reduce){.flow{animation:none}}
+.herog{display:grid;grid-template-columns:1.25fr .75fr;gap:24px;align-items:center}@media(max-width:820px){.herog{grid-template-columns:1fr}.art{max-width:240px;margin:auto}}.art svg{width:100%;filter:drop-shadow(0 0 18px rgba(92,200,215,.3))}.glow{margin-top:22px;border:1px solid var(--line);border-radius:10px;overflow:hidden}.glow svg{width:100%;display:block}.glow .g{filter:drop-shadow(0 0 3px #5cc8d7)}
+main{max-width:1200px;margin:auto;padding:0 5vw 60px}
+h2{font-size:20px;margin:36px 0 12px;font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;text-align:left;color:var(--tx);transition:border-color .2s,transform .2s}
+button.card:hover,button.card.on{border-color:var(--ac);transform:translateY(-2px)}
+.card h3{margin:6px 0 4px;font-size:16px}.card p{margin:0 0 8px;color:var(--mut);font-size:13px}
+.card svg{width:30px;height:30px;stroke:var(--ac);fill:none;stroke-width:1.6}
+.st{font-size:12px;display:flex;align-items:center;gap:6px;color:var(--mut)}.st i{width:8px;height:8px;border-radius:50%;background:var(--mut)}.st.live i{background:var(--ok)}
+.card .last{font-size:12.5px;color:var(--tx);min-height:20px}
+.work{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.work{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+label{display:grid;grid-template-columns:1fr 96px 42px;gap:8px;align-items:center;margin-bottom:9px;font-size:13.5px;color:var(--mut)}
+label small{font-size:12px}
+input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--tx);border-radius:5px;padding:6px 8px;font:inherit;font-family:'IBM Plex Mono',monospace;font-size:13px;transition:border-color .15s,box-shadow .15s}
+input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.res div{border-left:2px solid var(--ac);padding-left:10px}.res span{display:block;font-size:12px;color:var(--mut)}.res b{font-size:19px;font-weight:500}
+.err{color:var(--bad);font-size:13.5px;padding:8px 0}
+.chart svg{width:100%;height:auto;display:block}.chart text{fill:var(--mut);font-size:11px}
+.ax{stroke:var(--line)}.tip{min-height:20px;font-size:12.5px;color:var(--tx)}
+details{margin-top:10px;font-size:13px;color:var(--mut)}summary{cursor:pointer;color:var(--tx)}
+.note{font-size:12.5px;color:var(--mut);margin-top:10px}
+footer{border-top:1px solid var(--line);padding:18px 5vw;color:var(--mut);font-size:12.5px;background:var(--bg)}
+#bg{background:radial-gradient(ellipse at 72% 100%,#c06a32 0,transparent 50%),linear-gradient(#08121b 0%,#17283a 45%,#3b2f33 78%,#7a4429 100%)}
+body::before{background:linear-gradient(rgba(11,23,32,.5),rgba(11,23,32,.62))}
+[data-theme=light] body::before{background:rgba(243,246,248,.8)}
+.panel,.card,.flowbox,.glow{background:color-mix(in srgb,var(--panel) 70%,transparent);backdrop-filter:blur(5px)}
+header,footer{background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:blur(6px)}
+h1,.sub,.lead{text-shadow:0 2px 14px rgba(0,0,0,.6)}
+</style></head><body>
+<svg style="position:absolute;width:0;height:0" aria-hidden="true"><defs>
+<linearGradient id="mt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b6b76"/><stop offset=".22" stop-color="#eef3f6"/><stop offset=".55" stop-color="#a9b5bd"/><stop offset="1" stop-color="#46545e"/></linearGradient>
+<linearGradient id="mv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46545e"/><stop offset=".3" stop-color="#eef3f6"/><stop offset=".65" stop-color="#a9b5bd"/><stop offset="1" stop-color="#46545e"/></linearGradient>
+<linearGradient id="bl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5aa0ff"/><stop offset=".5" stop-color="#1f4fc4"/><stop offset="1" stop-color="#0f2a77"/></linearGradient>
+<linearGradient id="lq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd8ff"/><stop offset="1" stop-color="#2b78c8"/></linearGradient>
+<symbol id="sFeed" viewBox="0 0 120 100"><rect x="0" y="42" width="120" height="16" fill="url(#mt)"/><rect x="40" y="34" width="10" height="32" rx="2" fill="url(#mt)"/><rect x="70" y="34" width="10" height="32" rx="2" fill="url(#mt)"/></symbol>
+<symbol id="sPipe" viewBox="0 0 120 100"><g fill="none" stroke="#9aa8b1" stroke-width="5"><path d="M0 50H16V22H28M92 22H104V50H120M16 50V78H28M104 50V78H92"/></g><rect x="26" y="10" width="68" height="26" rx="13" fill="url(#mt)"/><rect x="26" y="64" width="68" height="26" rx="13" fill="url(#mt)"/><g fill="url(#mt)"><rect x="40" y="36" width="6" height="6"/><rect x="74" y="36" width="6" height="6"/></g></symbol>
+<symbol id="sPump" viewBox="0 0 120 100"><rect x="14" y="82" width="92" height="9" rx="2" fill="#7c8a94"/><rect x="0" y="44" width="30" height="14" fill="url(#mt)"/><path d="M42 8h14v8H42z" fill="url(#mt)"/><circle cx="46" cy="60" r="24" fill="url(#bl)"/><circle cx="46" cy="60" r="9" fill="#0f2a77" stroke="#8fb8ff" stroke-width="2"/><rect x="66" y="42" width="48" height="34" rx="6" fill="url(#bl)"/><g stroke="#0f2a77" stroke-width="2"><path d="M76 44v30M86 44v30M96 44v30M106 44v30"/></g><rect x="40" y="76" width="12" height="8" fill="#0f2a77"/></symbol>
+<symbol id="sHeat" viewBox="0 0 120 100"><rect x="26" y="66" width="10" height="20" fill="#6d7b85"/><rect x="84" y="66" width="10" height="20" fill="#6d7b85"/><rect x="8" y="34" width="104" height="34" rx="14" fill="url(#mt)"/><g stroke="#51606a" stroke-width="2"><path d="M30 40v22M38 40v22M46 40v22M54 40v22M62 40v22M70 40v22M78 40v22M86 40v22"/></g><rect x="0" y="44" width="10" height="14" fill="url(#mt)"/><rect x="110" y="44" width="10" height="14" fill="url(#mt)"/><path d="M80 34V20h8" fill="none" stroke="#9aa8b1" stroke-width="4"/><circle cx="80" cy="16" r="5" fill="#e0453a"/></symbol>
+<symbol id="sRx" viewBox="0 0 120 100"><rect x="52" y="4" width="16" height="12" rx="2" fill="url(#bl)"/><path d="M60 16v54" stroke="#cfd8de" stroke-width="3"/><rect x="32" y="22" width="56" height="62" rx="18" fill="url(#mv)"/><rect x="38" y="30" width="44" height="46" rx="12" fill="#9fd0e8" fill-opacity=".35"/><path d="M48 70h24M52 66l8 4 8-4" stroke="#e8eef2" stroke-width="3" fill="none"/><path d="M40 84l-6 12M80 84l6 12" stroke="#6d7b85" stroke-width="4"/><rect x="0" y="46" width="34" height="8" fill="url(#mt)"/><rect x="86" y="46" width="34" height="8" fill="url(#mt)"/></symbol>
+<symbol id="sSep" viewBox="0 0 120 100"><path d="M56 22V8h30" fill="none" stroke="#9aa8b1" stroke-width="5"/><rect x="34" y="20" width="52" height="64" rx="20" fill="url(#mv)"/><rect x="39" y="52" width="42" height="28" rx="13" fill="url(#lq)"/><rect x="40" y="30" width="40" height="8" fill="#6d7b85" fill-opacity=".6"/><path d="M60 84v10h26" fill="none" stroke="#9aa8b1" stroke-width="5"/><rect x="0" y="46" width="36" height="8" fill="url(#mt)"/><rect x="84" y="46" width="36" height="8" fill="url(#mt)"/></symbol>
+<symbol id="sProd" viewBox="0 0 120 100"><rect x="0" y="42" width="120" height="16" fill="url(#mt)"/><rect x="40" y="34" width="10" height="32" rx="2" fill="url(#mt)"/><path d="M70 50l10-12v24zM90 50L80 38v24z" fill="#9aa8b1"/><rect x="76" y="26" width="8" height="12" fill="#e0453a"/></symbol>
+</defs></svg>
+<div id="bg"><svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice"><defs><filter id="blr"><feGaussianBlur stdDeviation="22"/></filter></defs><g filter="url(#blr)" fill="#05090d" opacity=".6"><ellipse cx="200" cy="120" rx="260" ry="46"/><ellipse cx="700" cy="70" rx="320" ry="40"/><ellipse cx="1050" cy="190" rx="280" ry="50"/><ellipse cx="480" cy="250" rx="240" ry="34"/></g><g fill="#0c1b27" opacity=".85"><rect x="40" y="330" width="30" height="370"/><rect x="230" y="280" width="16" height="420"/><rect x="560" y="300" width="44" height="400"/><rect x="860" y="340" width="26" height="360"/><rect x="1040" y="290" width="38" height="410"/><rect x="0" y="470" width="1200" height="6"/><rect x="0" y="520" width="1200" height="4"/></g><g transform="translate(0,400)"><rect y="262" width="1200" height="40"/><rect x="0" y="228" width="1200" height="5"/><rect x="96" y="80" width="38" height="190"/><rect x="90" y="74" width="50" height="8"/><rect x="156" y="140" width="24" height="130"/><rect x="296" y="50" width="14" height="220"/><rect x="340" y="120" width="10" height="150"/><circle cx="440" cy="222" r="42"/><rect x="420" y="250" width="6" height="20"/><rect x="454" y="250" width="6" height="20"/><rect x="520" y="196" width="130" height="74" rx="8"/><rect x="700" y="60" width="42" height="210"/><rect x="694" y="100" width="54" height="6"/><rect x="694" y="160" width="54" height="6"/><rect x="760" y="130" width="60" height="140"/><rect x="896" y="36" width="6" height="234"/><path d="M899 8c-10 14-8 22 0 28 8-6 10-14 0-28z" fill="#f2994a"/><rect x="980" y="150" width="96" height="120"/><rect x="1100" y="96" width="16" height="174"/><g fill="#f2994a"><circle cx="115" cy="120" r="2"/><circle cx="115" cy="190" r="2"/><circle cx="721" cy="130" r="2"/><circle cx="721" cy="200" r="2"/><circle cx="1028" cy="190" r="2"/></g></g></svg></div>
+<header><b>CHEMSIMULATOR</b><nav><a href="#modules">Modules</a><a href="#work">Workspace</a><button class="tg" id="th" aria-label="Toggle theme">Light</button></nav></header>
+<section class="hero">
+<div class="herog"><div>
+<h1>CHEMSIMULATOR</h1>
+<div class="sub">Chemical Process Analysis &amp; Simulation Platform</div>
+<p class="lead">Chemical engineering, numerical computing, data analysis, visualization and optimization in one workspace. Select a unit operation in the flowsheet to open its calculation module.</p>
+</div><div class="art"><svg viewBox="0 0 300 340" aria-hidden="true"><ellipse cx="150" cy="312" rx="125" ry="20" fill="#02080c" opacity=".6"/><rect x="40" y="296" width="220" height="12" rx="3" fill="#6d7b85"/><g fill="none" stroke-width="5"><path d="M110 240H82M196 120h38v118" stroke="#f2994a"/><path d="M150 32V14h60M62 215V130h50" stroke="#9aa8b1"/></g><rect x="196" y="56" width="9" height="226" fill="#6d7b85"/><g stroke="#46545e" stroke-width="2"><path d="M196 70h9M196 86h9M196 102h9M196 118h9M196 134h9M196 150h9M196 166h9M196 182h9M196 198h9M196 214h9M196 230h9M196 246h9M196 262h9"/></g><rect x="104" y="28" width="92" height="256" rx="22" fill="url(#mv)"/><g stroke="#51606a" stroke-width="2.5" opacity=".8"><path d="M104 92h92M104 150h92M104 208h92M104 256h92"/></g><g fill="#6d7b85"><rect x="92" y="88" width="116" height="5" rx="2"/><rect x="92" y="146" width="116" height="5" rx="2"/><rect x="92" y="204" width="116" height="5" rx="2"/></g><g fill="#cfd8de"><circle cx="116" cy="60" r="2"/><circle cx="184" cy="60" r="2"/><circle cx="116" cy="120" r="2"/><circle cx="184" cy="120" r="2"/><circle cx="116" cy="180" r="2"/><circle cx="184" cy="180" r="2"/></g><circle cx="150" cy="238" r="9" fill="#0f2a77" stroke="#8fb8ff" stroke-width="2"/><use href="#sHeat" x="0" y="196" width="108" height="90"/><use href="#sSep" x="196" y="206" width="104" height="87"/><circle cx="150" cy="238" r="3" fill="#8fb8ff"/><circle cx="215" cy="46" r="5" fill="#e0453a"/></svg></div></div>
+<div class="glow"><svg viewBox="0 0 900 150" aria-hidden="true"><defs><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#06203a"/><stop offset="1" stop-color="#0a3f5a"/></linearGradient></defs><rect width="900" height="150" fill="url(#gb)"/><g class="flow-bg" style="--d:2s"><path class="flow" d="M0 80H900"/><path class="flow hot" d="M270 80H520"/></g><use href="#sFeed" x="8" y="30" width="120" height="100"/><use href="#sPipe" x="135" y="30" width="120" height="100"/><use href="#sPump" x="262" y="30" width="120" height="100"/><use href="#sHeat" x="389" y="30" width="120" height="100"/><use href="#sRx" x="516" y="30" width="120" height="100"/><use href="#sSep" x="643" y="30" width="120" height="100"/><use href="#sProd" x="770" y="30" width="120" height="100"/><g fill="#9bdde8" font-size="11" font-family="IBM Plex Sans,sans-serif"><text x="838" y="26">Gas</text><text x="838" y="142">Liquid</text></g></svg></div>
+<div class="flowbox"><svg id="pfd" viewBox="0 0 900 150" role="img" aria-label="Process flow diagram: feed, pipe, pump, heater, reactor, separator, product"></svg></div>
+<p class="note">Flow animation is an educational schematic, not CFD or a plant simulation.</p>
+</section>
+<main>
+<h2 id="modules">Dashboard</h2>
+<div class="cards" id="cards"></div>
+<h2 id="work">Workspace</h2>
+<div class="work">
+<div class="panel"><h3 id="mt" style="margin:0 0 12px"></h3><div id="inp"></div></div>
+<div>
+<div class="panel"><div id="viz"></div><div id="out"></div></div>
+<div class="panel chart" style="margin-top:16px"><svg id="ch" viewBox="0 0 600 320"></svg><div class="tip mono" id="tip">Hover the curve for values.</div></div>
+</div></div>
+</main>
+<footer>ChemSimulator — academic project. Correlations: Darcy–Weisbach with Swamee–Jain, LMTD method, ideal CSTR/PFR first-order kinetics, steady-state component balance.</footer>
+<script>
+const $=s=>document.querySelector(s);
+const fmt=x=>!isFinite(x)?'—':(Math.abs(x)>=1e5||(Math.abs(x)<1e-2&&x!==0))?x.toExponential(2):+x.toPrecision(4);
+const clamp=(a,lo,hi)=>Math.min(hi,Math.max(lo,a));
+const M={
+fluid:{t:'Fluid Flow',d:'Reynolds number, friction factor and pressure drop in a straight pipe.',ic:'M3 9h18M3 15h18M7 9v6M17 9v6',
+in:[['Q','Flow rate','m³/h',20],['D','Diameter','mm',50],['L','Length','m',100],['rho','Density','kg/m³',998],['mu','Viscosity','mPa·s',1],['eps','Roughness','mm',0.045]],
+calc(v){const d=v.D/1e3,A=Math.PI*d*d/4,f=Q=>{const u=Q/3600/A,Re=v.rho*u*d/(v.mu/1e3),ff=Re<2300?64/Re:.25/Math.pow(Math.log10(v.eps/1e3/(3.7*d)+5.74/Math.pow(Re,.9)),2);return{u,Re,ff,dp:ff*v.L/d*v.rho*u*u/2/1e3}};
+const r=f(v.Q),pts=[];for(let i=1;i<=24;i++){const q=v.Q*i/12;pts.push([q,f(q).dp])}
+const reg=r.Re<2300?'Laminar':r.Re<4000?'Transitional':'Turbulent';
+return{out:[['Velocity',r.u,'m/s'],['Reynolds no.',r.Re,reg],['Friction factor',r.ff,'—'],['Pressure drop',r.dp,'kPa']],
+chart:{x:'Flow rate (m³/h)',y:'Pressure drop (kPa)',s:[{n:'ΔP',p:pts}],pt:[v.Q,r.dp]},viz:vizPipe(clamp(1.2/r.u,.3,6)),
+sum:`Re = ${fmt(r.Re)} (${reg}); ΔP = ${fmt(r.dp)} kPa`,
+eq:'v = Q/A; Re = ρvD/μ; f = 64/Re (laminar) or Swamee–Jain (turbulent); ΔP = f(L/D)ρv²/2'}}},
+heat:{t:'Heat Transfer',d:'Counter-current exchanger duty, LMTD and required area.',ic:'M4 8h16M4 16h16M8 4v16M16 4v16',
+in:[['Thi','Hot in','°C',150],['Tho','Hot out','°C',90],['Tci','Cold in','°C',25],['Tco','Cold out','°C',80],['U','U','W/m²K',450],['Ch','Hot m·cp','kW/K',5]],
+calc(v){const d1=v.Thi-v.Tco,d2=v.Tho-v.Tci;if(d1<=0||d2<=0||v.Thi<=v.Tho||v.Tco<=v.Tci)return{err:'Temperature crossover: check that hot > cold at both ends and each stream changes in the correct direction.'};
+const Q=v.Ch*(v.Thi-v.Tho),lm=Math.abs(d1-d2)<1e-9?d1:(d1-d2)/Math.log(d1/d2),A=Q*1e3/(v.U*lm),Cc=Q/(v.Tco-v.Tci),pts=[],pc=[];
+for(let i=0;i<=20;i++){const x=i/20;pts.push([x,v.Thi-(v.Thi-v.Tho)*x]);pc.push([x,v.Tco-(v.Tco-v.Tci)*x])}
+return{out:[['Duty',Q,'kW'],['LMTD',lm,'K'],['Area',A,'m²'],['Cold m·cp',Cc,'kW/K']],
+chart:{x:'Position along exchanger (fraction)',y:'Temperature (°C)',s:[{n:'Hot',p:pts,c:'var(--hot)'},{n:'Cold',p:pc}]},viz:vizHX(clamp(8/v.Ch,.8,5)),
+sum:`Q = ${fmt(Q)} kW; A = ${fmt(A)} m²`,eq:'Q = m·cp·ΔT; LMTD = (ΔT₁−ΔT₂)/ln(ΔT₁/ΔT₂); A = Q/(U·LMTD)'}}},
+reactor:{t:'Reactor Analysis',d:'First-order conversion in an ideal CSTR and PFR.',ic:'M8 4h8v14a4 4 0 0 1-8 0zM8 10h8',
+in:[['k','Rate constant k','1/min',0.25],['V','Volume','L',200],['v0','Feed flow','L/min',20]],
+calc(v){const tau=v.V/v.v0,xs=t=>[t*v.k/(1+t*v.k),1-Math.exp(-t*v.k)],[xc,xp]=xs(tau),tm=Math.max(3*tau,1),a=[],b=[];
+for(let i=0;i<=30;i++){const t=tm*i/30,[c,p]=xs(t);a.push([t,c]);b.push([t,p])}
+const Vc=xp<1?v.v0*xp/(v.k*(1-xp)):Infinity;
+return{out:[['Residence time τ',tau,'min'],['X (CSTR)',xc,'—'],['X (PFR)',xp,'—'],['CSTR volume for PFR X',Vc,'L']],
+chart:{x:'Residence time τ (min)',y:'Conversion X',s:[{n:'PFR',p:b},{n:'CSTR',p:a,c:'var(--hot)'}],pt:[tau,xp]},viz:vizRx(xp,xc),
+sum:`τ = ${fmt(tau)} min; X(PFR) = ${fmt(xp)}`,eq:'CSTR: X = kτ/(1+kτ); PFR: X = 1−exp(−kτ); τ = V/v₀'}}},
+mat:{t:'Material Balance',d:'Steady-state balance around a separator.',ic:'M3 12h5M8 8h8v8H8zM16 10l5-3M16 14l5 3',
+in:[['F','Feed','kmol/h',100],['xF','Feed fraction A','—',0.4],['rec','Recovery of A','—',0.9],['xP','Product purity A','—',0.95]],
+calc(v){const P=v.F*v.xF*v.rec/v.xP,W=v.F-P;if(P>v.F||W<=0)return{err:'Infeasible: product flow exceeds feed. Lower recovery or raise purity.'};const xW=(v.F*v.xF-P*v.xP)/W,pts=[];
+for(let i=0;i<=10;i++){const r=.5+i*.05;pts.push([r,v.F*v.xF*r/v.xP])}
+return{out:[['Product P',P,'kmol/h'],['Bottoms W',W,'kmol/h'],['Bottoms A fraction',xW,'—'],['Check F−P−W',v.F-P-W,'kmol/h']],
+chart:{x:'Recovery of A',y:'Product flow (kmol/h)',s:[{n:'P',p:pts}],pt:[v.rec,P]},viz:vizMB(v.F,P,W,v.xF,v.xP,xW),
+sum:`P = ${fmt(P)} kmol/h; W = ${fmt(W)} kmol/h`,eq:'F = P + W; F·xF = P·xP + W·xW; P = F·xF·rec/xP'}}},
+data:{t:'Data Analysis',d:'Experimental vs predicted data, regression.',ic:'M4 19V5M4 19h16M8 15l3-4 3 2 4-6',planned:1},
+opt:{t:'Optimization',d:'Parameter vs objective function.',ic:'M4 18c4-12 8-12 16 0M12 8v-3',planned:1}};
+const stage=(id,svg)=>svg;
+function vizPipe(d){return`<svg viewBox="0 0 600 90" style="--d:${d}s;width:100%"><rect x="30" y="20" width="540" height="40" rx="4" fill="url(#mt)"/><rect x="38" y="30" width="524" height="20" rx="3" fill="#0f3a52"/><path class="flow" d="M44 40H556"/><g fill="url(#mt)"><rect x="22" y="12" width="12" height="56" rx="2"/><rect x="294" y="12" width="12" height="56" rx="2"/><rect x="566" y="12" width="12" height="56" rx="2"/></g><text x="20" y="85" fill="var(--mut)" font-size="11">Particle speed follows calculated velocity (schematic)</text></svg>`}
+function vizHX(d){return`<svg viewBox="0 0 600 130" style="--d:${d}s;width:100%"><rect x="70" y="16" width="460" height="82" rx="34" fill="url(#mt)"/><rect x="100" y="30" width="400" height="54" rx="10" fill="#0f3a52"/><path class="flow hot" d="M20 45H580"/><path class="flow rev" d="M580 69H20"/><g fill="url(#mt)"><rect x="0" y="38" width="76" height="14" rx="2"/><rect x="524" y="62" width="76" height="14" rx="2"/><rect x="60" y="10" width="12" height="94" rx="2"/><rect x="528" y="10" width="12" height="94" rx="2"/></g><g stroke="#51606a" stroke-width="2"><path d="M100 90v6M200 90v6M300 90v6M400 90v6M500 90v6"/></g><text x="70" y="125" fill="var(--hot)" font-size="11">Hot →</text><text x="140" y="125" fill="var(--ac)" font-size="11">← Cold</text></svg>`}
+function vizRx(xp,xc){return`<svg viewBox="0 0 600 150" style="--d:2s;width:100%"><path class="flow" d="M60 75H215"/><path class="flow hot" d="M385 75H540"/><use href="#sRx" x="210" y="0" width="180" height="150"/><rect x="267" y="45" width="66" height="69" rx="18" fill="var(--ac)" fill-opacity="${.1+.6*xp}"/><text x="60" y="65" fill="var(--mut)" font-size="11">Reactants</text><text x="450" y="65" fill="var(--mut)" font-size="11">Products</text><text x="300" y="142" text-anchor="middle" fill="var(--tx)" font-size="12">X = ${fmt(xp)}</text></svg>`}
+function vizMB(F,P,W,xF,xP,xW){const w=n=>clamp(2+n/F*8,2,10);return`<svg viewBox="0 0 600 170" style="--d:2s;width:100%"><use href="#sSep" x="210" y="10" width="180" height="150"/><path class="flow" style="stroke-width:${w(F)}" d="M30 85H215"/><path class="flow hot" style="stroke-width:${w(P)}" d="M339 22H570"/><path class="flow" style="stroke-width:${w(W)}" d="M339 151H570"/><text x="30" y="70" fill="var(--mut)" font-size="11">F ${fmt(F)} · xA ${fmt(xF)}</text><text x="400" y="14" fill="var(--mut)" font-size="11">P ${fmt(P)} · xA ${fmt(xP)}</text><text x="400" y="143" fill="var(--mut)" font-size="11">W ${fmt(W)} · xA ${fmt(xW)}</text></svg>`}
+let cur='fluid',vals={};
+const ic=p=>`<svg viewBox="0 0 24 24"><path d="${p}"/></svg>`;
+function cards(){$('#cards').innerHTML=Object.entries(M).map(([k,m])=>`<${m.planned?'div':'button'} class="card ${k===cur?'on':''}" ${m.planned?'':`data-k="${k}"`}>${ic(m.ic)}<h3>${m.t}</h3><p>${m.d}</p><div class="last mono" id="l-${k}">${m.planned?'':'—'}</div><div class="st ${m.planned?'':'live'}"><i></i>${m.planned?'Planned':'Ready'}</div></${m.planned?'div':'button'}>`).join('');
+document.querySelectorAll('button.card').forEach(b=>b.onclick=()=>{open(b.dataset.k);$('#work').scrollIntoView()})}
+function open(k){cur=k;const m=M[k];vals[k]=vals[k]||Object.fromEntries(m.in.map(i=>[i[0],i[3]]));
+$('#mt').textContent=m.t;$('#inp').innerHTML=m.in.map(i=>`<label>${i[1]}<input type="number" step="any" data-k="${i[0]}" value="${vals[k][i[0]]}" aria-label="${i[1]}"><small>${i[2]}</small></label>`).join('');
+document.querySelectorAll('#inp input').forEach(e=>e.oninput=()=>{const x=parseFloat(e.value);if(isFinite(x)){vals[k][e.dataset.k]=x;run()}});
+document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',c.dataset.k===k));run()}
+function run(){const m=M[cur],r=m.calc(vals[cur]);
+if(r.err){$('#out').innerHTML=`<div class="err" role="alert">${r.err}</div>`;return}
+$('#viz').innerHTML=r.viz;
+$('#out').innerHTML=`<div class="res">${r.out.map(o=>`<div><span>${o[0]}</span><b class="mono">${fmt(o[1])}</b> <small style="color:var(--mut)">${o[2]}</small></div>`).join('')}</div><details><summary>Calculation details</summary><p class="mono">${r.eq}</p></details>`;
+const l=$('#l-'+cur);if(l)l.textContent=r.sum;draw(r.chart)}
+function draw(c){const all=c.s.flatMap(s=>s.p),xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(0,...ys),y1=Math.max(...ys);if(y1===y0)y1=y0+1;
+const sx=x=>55+(x-x0)/(x1-x0||1)*525,sy=y=>270-(y-y0)/(y1-y0)*240;let h='';
+for(let i=0;i<=4;i++){const xv=x0+(x1-x0)*i/4,yv=y0+(y1-y0)*i/4;h+=`<line class="ax" x1="55" x2="580" y1="${sy(yv)}" y2="${sy(yv)}"/><text x="50" y="${sy(yv)+4}" text-anchor="end">${fmt(yv)}</text><text x="${sx(xv)}" y="288" text-anchor="middle">${fmt(xv)}</text>`}
+c.s.forEach((s,i)=>{h+=`<polyline fill="none" stroke="${s.c||'var(--ac)'}" stroke-width="2.2" points="${s.p.map(p=>sx(p[0])+','+sy(p[1])).join(' ')}"/><text x="${70+i*70}" y="16" fill="${s.c||'var(--ac)'}">— ${s.n}</text>`});
+if(c.pt)h+=`<circle cx="${sx(c.pt[0])}" cy="${sy(c.pt[1])}" r="5" fill="var(--bg)" stroke="var(--tx)" stroke-width="2"/>`;
+h+=`<text x="318" y="312" text-anchor="middle">${c.x}</text><text transform="translate(12 150) rotate(-90)" text-anchor="middle">${c.y}</text><line id="cur" class="ax" y1="30" y2="270" x1="-9" x2="-9" stroke="var(--mut)"/>`;
+const s=$('#ch');s.innerHTML=h;
+s.onmousemove=e=>{const b=s.getBoundingClientRect(),x=(e.clientX-b.left)/b.width*600;let best=c.s[0].p[0];c.s[0].p.forEach(p=>{if(Math.abs(sx(p[0])-x)<Math.abs(sx(best[0])-x))best=p});
+$('#cur').setAttribute('x1',sx(best[0]));$('#cur').setAttribute('x2',sx(best[0]));
+$('#tip').textContent=c.s.map(q=>{const p=q.p.reduce((a,b)=>Math.abs(b[0]-best[0])<Math.abs(a[0]-best[0])?b:a);return`${q.n}: ${fmt(p[1])}`}).join('  |  ')+`  @ x = ${fmt(best[0])}`}}
+// flowsheet
+const N=[['Feed',null,'sFeed'],['Pipe','fluid','sPipe'],['Pump',null,'sPump'],['Heater','heat','sHeat'],['Reactor','reactor','sRx'],['Separator','mat','sSep'],['Product',null,'sProd']];
+$('#pfd').innerHTML=N.map((n,i)=>{const x=4+i*128;return`${i?`<path class="flow ${i==3?'hot':''}" d="M${x-12} 58H${x}"/>`:''}<g class="node" ${n[1]?`tabindex="0" role="button" aria-label="${n[0]} module" data-k="${n[1]}"`:''}><rect x="${x}" y="10" width="116" height="96" rx="10"/><use href="#${n[2]}" x="${x+8}" y="14" width="100" height="70"/><text x="${x+58}" y="99" text-anchor="middle">${n[0]}</text></g>`}).join('')+'<text x="4" y="132" fill="var(--mut)" font-size="11">Feed → Pipe → Heater → Reactor → Separator → Product (select a unit to open its module)</text>';
+document.querySelectorAll('.node[data-k]').forEach(g=>{const go=()=>{open(g.dataset.k);$('#work').scrollIntoView()};g.onclick=go;g.onkeydown=e=>{if(e.key=='Enter')go()}});
+// theme
+const th=$('#th');th.onclick=()=>{const d=document.documentElement,n=d.dataset.theme=='dark'?'light':'dark';d.dataset.theme=n;th.textContent=n=='dark'?'Light':'Dark';try{localStorage.setItem('cs',n)}catch(e){}};
+try{const s=localStorage.getItem('cs');if(s){document.documentElement.dataset.theme=s;th.textContent=s=='dark'?'Light':'Dark'}}catch(e){}
+cards();Object.keys(M).filter(k=>!M[k].planned).forEach(k=>{cur=k;open(k)});open('fluid');
+</script></body></html>
